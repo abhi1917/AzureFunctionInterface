@@ -12,18 +12,12 @@ using System.Net.Http;
 using System.Net;
 using System.Linq;
 using System.Text;
+using AzureFunctionInterface.Models;
 
 namespace AzureFunctionInterface
 {
     public static class CustomerCosmosView
     {
-        public class CustomerDetail
-        {
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-            public string Address { get; set; }
-            public string Phonenumber { get; set; }
-        }
         [FunctionName("CustomerCosmosView")]
         public static HttpResponseMessage Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,

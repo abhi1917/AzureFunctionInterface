@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using AzureFunctionInterface.Models;
 using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -15,11 +16,6 @@ namespace AzureFunctionInterface
 {
     public static class CustomerEventListner
     {
-        public class CustomerSendEvent
-        {
-            public string CustomerId { get; set; }
-            public string AgentId { get; set; }
-        }
 
         [FunctionName("CustomerEventListner")]
         public static async Task Run([EventHubTrigger("%EventHubName%", Connection = "EventHub")] EventData[] events, ILogger log)

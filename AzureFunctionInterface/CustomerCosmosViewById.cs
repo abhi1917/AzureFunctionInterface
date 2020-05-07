@@ -12,18 +12,12 @@ using System.Net.Http;
 using System.Net;
 using System.Text;
 using System.Linq;
+using AzureFunctionInterface.Models;
 
 namespace AzureFunctionInterface
 {
     public static class CustomerCosmosViewById
     {
-        public class CustomerDetail
-        {
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-            public string Address { get; set; }
-            public string Phonenumber { get; set; }
-        }
 
         [FunctionName("CustomerCosmosViewById")]
         public static HttpResponseMessage Run(
@@ -42,7 +36,7 @@ namespace AzureFunctionInterface
             {
                 List<CustomerDetail> returnList = customers.ToList();
                 jsonValue = JsonConvert.SerializeObject(returnList);
-                response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                response = new HttpResponseMessage(HttpStatusCode.OK);
                 response.Content = new StringContent(jsonValue, UnicodeEncoding.UTF8, "application/json");
             }
             catch (Exception ex)

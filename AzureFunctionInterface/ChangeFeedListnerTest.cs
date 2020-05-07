@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using AzureFunctionInterface.Models;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
@@ -13,11 +14,6 @@ namespace AzureFunctionInterface
 {
     public static class ChangeFeedListnerTest
     {
-        public class CustomerSendEvent
-        {
-            public string CustomerId { get; set; }
-            public string AgentId { get; set; }
-        }
 
         [FunctionName("ChangeFeedListnerTest")]
         public static void Run([CosmosDBTrigger(
