@@ -34,6 +34,7 @@ namespace AzureFunctionInterface
                     };
                     var url = Environment.GetEnvironmentVariable("apiEventInvokeurl",EnvironmentVariableTarget.Process);
                     log.LogInformation(url);
+                    log.LogInformation("auth: " + Environment.GetEnvironmentVariable("apiAuthToken", EnvironmentVariableTarget.Process));
                     var content = JsonConvert.SerializeObject(customer);
                     if (null != content)
                     {
