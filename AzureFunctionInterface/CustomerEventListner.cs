@@ -25,6 +25,7 @@ namespace AzureFunctionInterface
             {
                 foreach (EventData eventData in events)
                 {
+                    log.LogInformation("inside for loop");
                     string value = Encoding.UTF8.GetString(eventData.Body);
                     CustomerSendEvent customer = new CustomerSendEvent
                     {
@@ -45,6 +46,7 @@ namespace AzureFunctionInterface
                     {
                         throw new Exception("Failed to serialize object!");
                     }
+                    log.LogInformation("testing comment");
                     log.LogInformation(value);
                 }
             }
