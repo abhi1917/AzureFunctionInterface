@@ -21,11 +21,11 @@ namespace AzureFunctionInterface
 
         private Container GetContainer(IServiceProvider options)
         {
-            var cosmosDbEndPoint = Environment.GetEnvironmentVariable("endpointUri");
-            var cosmosDbAuthKey = Environment.GetEnvironmentVariable("customerPrimaryKey");
-            var cosmosDbDatabaseName = Environment.GetEnvironmentVariable("databaseId");
-            var cosmosDbContainerName = Environment.GetEnvironmentVariable("containerId");
-            var cosmosDbPartitionKey = Environment.GetEnvironmentVariable("CustomerPartitionKey");
+            var cosmosDbEndPoint = Environment.GetEnvironmentVariable("endpointUri", EnvironmentVariableTarget.Process);
+            var cosmosDbAuthKey = Environment.GetEnvironmentVariable("customerPrimaryKey", EnvironmentVariableTarget.Process);
+            var cosmosDbDatabaseName = Environment.GetEnvironmentVariable("databaseId", EnvironmentVariableTarget.Process);
+            var cosmosDbContainerName = Environment.GetEnvironmentVariable("containerId", EnvironmentVariableTarget.Process);
+            var cosmosDbPartitionKey = Environment.GetEnvironmentVariable("CustomerPartitionKey", EnvironmentVariableTarget.Process);
 
             var client = new CosmosClient(cosmosDbEndPoint, cosmosDbAuthKey, new CosmosClientOptions {
                 ConnectionMode = ConnectionMode.Direct

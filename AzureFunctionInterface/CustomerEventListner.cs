@@ -32,21 +32,19 @@ namespace AzureFunctionInterface
                         CustomerId = value,
                         AgentId = "EventHub"
                     };
-                    var url = "testUrl";
-                    url = Environment.GetEnvironmentVariable("apiEventInvokeurl",EnvironmentVariableTarget.Process);
+                    var url = Environment.GetEnvironmentVariable("apiEventInvokeurl",EnvironmentVariableTarget.Process);
                     log.LogInformation(url);
                     var content = JsonConvert.SerializeObject(customer);
                     if (null != content)
                     {
                         var stringContent = new StringContent(content, UnicodeEncoding.UTF8, "application/json");
-                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", System.Environment.GetEnvironmentVariable("apiAuthToken"));
+                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Environment.GetEnvironmentVariable("apiAuthToken", EnvironmentVariableTarget.Process));
                         var result = await httpClient.PostAsync(url, stringContent);
                     }
                     else
                     {
                         throw new Exception("Failed to serialize object!");
                     }
-                    log.LogInformation("testing comment");
                     log.LogInformation(value);
                 }
             }
