@@ -31,8 +31,9 @@ namespace AzureFunctionInterface
                         CustomerId = value,
                         AgentId = "EventHub"
                     };
-                    var url = System.Environment.GetEnvironmentVariable("apiEventInvokeurl");
-                    log.LogInformation(System.Environment.GetEnvironmentVariable("apiEventInvokeurl"));
+                    var url = "testUrl";
+                    url = Environment.GetEnvironmentVariable("apiEventInvokeurl");
+                    log.LogInformation(url);
                     var content = JsonConvert.SerializeObject(customer);
                     if (null != content)
                     {
