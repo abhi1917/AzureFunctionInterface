@@ -13,16 +13,17 @@ using AzureFunctionInterface.Models;
 using System.Net.Http;
 using System.Net;
 using System.Text;
+using AzureFunctionInterface.Utilities;
 
 namespace AzureFunctionInterface
 {
     public class CosmosDependencyViewById
     {
-        private Container _customerContainer;
+        private CosmosClient _cosmosClient;
 
-        public CosmosDependencyViewById(Container customerContainer)
+        public CosmosDependencyViewById(CosmosClient cosmosClient)
         {
-            _customerContainer = customerContainer;
+            _cosmosClient = cosmosClient;
         }
 
         [FunctionName("CosmosDependencyViewById")]
@@ -39,7 +40,11 @@ namespace AzureFunctionInterface
                 {
                     string lastName = queryParams["lastName"].Replace("\"", "");
                     string id= queryParams["id"].Replace("\"", "");
-                    var returnResult = await _customerContainer.ReadItemAsync<CustomerCosmos>(id, new PartitionKey(lastName));
+                    var cosmosDbDatabaseName = Environment.GetEnvironmentVariable("databaseId", EnvironmentVariableTarget.Process);
+                    var cosmosDbContainerName = Environment.GetEnvironmentVariable("containerId", EnvironmentVariableTarget.Process);
+                    var cosmosDbPartitionKey = Environment.GetEnvironmentVariable("CustomerPartitionKey", EnvironmentVariableTarget.Process);
+                    var customerContainer = CosmosUtilities.GetContainer(_cosmosClient, cosmosDbDatabaseName, cosmosDbContainerName, cosmosDbPartitionKey);
+                    var returnResult = await customerContainer.ReadItemAsync<CustomerCosmos>(id, new PartitionKey(lastName));
                     var result = returnResult.Resource;
                     if (result != null)
                     {

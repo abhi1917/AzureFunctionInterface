@@ -46,7 +46,14 @@ namespace AzureFunctionInterface
                     returnList = customers.ToList();
                 }
                 jsonValue = JsonConvert.SerializeObject(returnList);
-                response = new HttpResponseMessage(HttpStatusCode.OK);
+                if (returnList.Count == 0)
+                {               
+                    response = new HttpResponseMessage(HttpStatusCode.NotFound);
+                }
+                else
+                {
+                    response = new HttpResponseMessage(HttpStatusCode.OK);
+                }
                 response.Content = new StringContent(jsonValue, UnicodeEncoding.UTF8, "application/json");
             }
             catch (Exception ex)

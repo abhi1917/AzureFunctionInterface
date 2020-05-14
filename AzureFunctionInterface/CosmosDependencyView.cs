@@ -13,15 +13,16 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Net;
+using AzureFunctionInterface.Utilities;
 
 namespace AzureFunctionInterface
 {
     public class CosmosDependencyView
     {
-        private Container _customerContainer;
-        public CosmosDependencyView(Container customerContainer)
+        private CosmosClient _cosmosClient;
+        public CosmosDependencyView(CosmosClient cosmosClient)
         {
-            _customerContainer = customerContainer;
+            _cosmosClient = cosmosClient;
         }
         [FunctionName("CosmosDependencyView")]
         public  async Task<HttpResponseMessage> Run(
@@ -37,33 +38,23 @@ namespace AzureFunctionInterface
                 if (queryParams.ContainsKey("lastName"))
                 {
                     string lastName = queryParams["lastName"].Replace("\"", "");
-                    sqlQueryText = "SELECT * FROM c WHERE (lower(c.LastName) =lower('" + lastName + "'))";
+                    sqlQueryText = "SELECT c.FirstName,c.LastName,c.Address,c.Phonenumber FROM c WHERE (lower(c.LastName) =lower('" + lastName + "'))";
 
 
                 }
                 else
                 {
-                    sqlQueryText = "SELECT * FROM c";
+                    sqlQueryText = "SELECT c.FirstName,c.LastName,c.Address,c.Phonenumber FROM c";
                 }
-                QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
-                FeedIterator<CustomerCosmos> queryResultSetIterator = _customerContainer.GetItemQueryIterator<CustomerCosmos>(queryDefinition);
-                List<CustomerDetail> returnCustomerList = new List<CustomerDetail>();
-
-                while (queryResultSetIterator.HasMoreResults)
+                var cosmosDbDatabaseName = Environment.GetEnvironmentVariable("databaseId", EnvironmentVariableTarget.Process);
+                var cosmosDbContainerName = Environment.GetEnvironmentVariable("containerId", EnvironmentVariableTarget.Process);
+                var cosmosDbPartitionKey = Environment.GetEnvironmentVariable("CustomerPartitionKey", EnvironmentVariableTarget.Process);
+                var returnList = await CosmosUtilities.ReadItems(_cosmosClient, cosmosDbDatabaseName, cosmosDbContainerName, cosmosDbPartitionKey, sqlQueryText);
+                string jsonValue = "";
+                if (null != returnList)
                 {
-                    FeedResponse<CustomerCosmos> currentResultSet = await queryResultSetIterator.ReadNextAsync();
-                    foreach (CustomerCosmos customer in currentResultSet)
-                    {
-                        returnCustomerList.Add(new CustomerDetail
-                        {
-                            FirstName = customer.FirstName,
-                            LastName = customer.LastName,
-                            Address = customer.Address,
-                            Phonenumber = customer.Phonenumber
-                        });
-                    }
+                    jsonValue = JsonConvert.SerializeObject(returnList);
                 }
-                string jsonValue = JsonConvert.SerializeObject(returnCustomerList);
                 response = new HttpResponseMessage(HttpStatusCode.OK);
                 response.Content = new StringContent(jsonValue, UnicodeEncoding.UTF8, "application/json");
 

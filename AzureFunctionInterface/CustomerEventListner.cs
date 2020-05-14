@@ -25,7 +25,6 @@ namespace AzureFunctionInterface
             {
                 foreach (EventData eventData in events)
                 {
-                    log.LogInformation("inside for loop");
                     string value = Encoding.UTF8.GetString(eventData.Body);
                     CustomerSendEvent customer = new CustomerSendEvent
                     {
@@ -33,8 +32,6 @@ namespace AzureFunctionInterface
                         AgentId = "EventHub"
                     };
                     var url = Environment.GetEnvironmentVariable("apiEventInvokeurl",EnvironmentVariableTarget.Process);
-                    log.LogInformation(url);
-                    log.LogInformation("auth: " + Environment.GetEnvironmentVariable("apiAuthToken", EnvironmentVariableTarget.Process));
                     var content = JsonConvert.SerializeObject(customer);
                     if (null != content)
                     {
@@ -46,7 +43,7 @@ namespace AzureFunctionInterface
                     {
                         throw new Exception("Failed to serialize object!");
                     }
-                    log.LogInformation(value);
+                    log.LogInformation("New Customer with Id: "+value+" was added to cosmos DB.");
                 }
             }
             catch (Exception ex)

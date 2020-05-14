@@ -9,16 +9,18 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Microsoft.Azure.Cosmos;
 using AzureFunctionInterface.Models;
+using AzureFunctionInterface.Utilities;
+using System.Collections.Generic;
 
 namespace AzureFunctionInterface
 {
     public class CosmosDependencyAdd
     {
-        private Container _customerContainer;
+        private CosmosClient _cosmosClient;
 
-        public CosmosDependencyAdd(Container customerContainer)
+        public CosmosDependencyAdd(CosmosClient cosmosClient)
         {
-            _customerContainer = customerContainer;
+            _cosmosClient = cosmosClient;
         }
 
         [FunctionName("CosmosDependencyAdd")]
@@ -31,10 +33,18 @@ namespace AzureFunctionInterface
             try
             {
                 string customerBody = await new StreamReader(req.Body).ReadToEndAsync();
-                CustomerCosmos customer = JsonConvert.DeserializeObject<CustomerCosmos>(customerBody);
-                await _customerContainer.CreateItemAsync(customer, customer.PartitionKey);
-
-                return new OkObjectResult("Customer:"+customer.FirstName+" "+customer.LastName+"has been added!");
+                var customer = JsonConvert.DeserializeObject<Dictionary<string,string>>(customerBody);
+                var cosmosDbDatabaseName = Environment.GetEnvironmentVariable("databaseId", EnvironmentVariableTarget.Process);
+                var cosmosDbContainerName = Environment.GetEnvironmentVariable("containerId", EnvironmentVariableTarget.Process);
+                var cosmosDbPartitionKey = Environment.GetEnvironmentVariable("CustomerPartitionKey", EnvironmentVariableTarget.Process);
+                //var customerContainer = CosmosUtilities.GetContainer(_cosmosClient, cosmosDbDatabaseName, cosmosDbContainerName, cosmosDbPartitionKey);
+                //await customerContainer.CreateItemAsync(customer, customer.PartitionKey);
+                if (CosmosUtilities.ValidateObject(customer, cosmosDbPartitionKey))
+                {
+                    var result = await CosmosUtilities.CreateItem(_cosmosClient, cosmosDbDatabaseName, cosmosDbContainerName, cosmosDbPartitionKey, customer);
+                    return new StatusCodeResult((int)result.StatusCode);
+                }
+                return new StatusCodeResult(StatusCodes.Status400BadRequest);
             }
             catch(Exception ex)
             {
